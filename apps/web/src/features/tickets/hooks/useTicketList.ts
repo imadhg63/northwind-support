@@ -46,8 +46,19 @@ export function useTicketList() {
     const handle = window.setTimeout(load, DEBOUNCE_MS);
 
     return () => window.clearTimeout(handle);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- filters object identity changes every render
-  }, [filters.search, filters.page, filters.pageSize]);
+  }, [
+    filters.search,
+    filters.status,
+    filters.priority,
+    filters.categoryId,
+    filters.customerId,
+    filters.assignedAgentId,
+    filters.unassignedOnly,
+    filters.page,
+    filters.pageSize,
+    filters.sortBy,
+    filters.sortDirection,
+  ]);
 
   const updateFilters = (patch: Partial<TicketFilters>) =>
     setFilters((current) => ({ ...current, ...patch, page: patch.page ?? 1 }));
