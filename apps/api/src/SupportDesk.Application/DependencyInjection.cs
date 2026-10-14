@@ -9,16 +9,20 @@ using SupportDesk.Application.Features.Tickets.Commands.ChangeTicketStatus;
 using SupportDesk.Application.Features.Tickets.Commands.RaiseTicket;
 using SupportDesk.Application.Features.Tickets.Queries.GetTicket;
 using SupportDesk.Application.Features.Tickets.Queries.SearchTickets;
+using SupportDesk.Application.Features.Tickets.Triage;
 
 namespace SupportDesk.Application;
 
 /// <summary>
-/// Registers the command and query handlers and the request validators.
+/// Registers the command and query handlers, triage service, and request validators.
 /// </summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        // Register Core Triage Service used by both Create and Escalate
+        services.AddScoped<TicketTriageService>();
+
         services.AddScoped<RaiseTicketCommandHandler>();
         services.AddScoped<ChangeTicketStatusCommandHandler>();
         services.AddScoped<AssignTicketCommandHandler>();

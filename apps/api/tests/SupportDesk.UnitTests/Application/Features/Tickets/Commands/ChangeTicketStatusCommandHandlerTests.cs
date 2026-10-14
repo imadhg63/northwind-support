@@ -6,11 +6,11 @@ using SupportDesk.UnitTests.TestDoubles;
 
 namespace SupportDesk.UnitTests.Application.Features.Tickets.Commands;
 
-/// <remarks>
+/// <summary>
 /// The lifecycle rules themselves are covered by
 /// <see cref="Domain.Aggregates.Tickets.TicketTests"/>; these tests
 /// cover what the use case adds around them.
-/// </remarks>
+/// </summary>
 public class ChangeTicketStatusCommandHandlerTests
 {
     [Fact]

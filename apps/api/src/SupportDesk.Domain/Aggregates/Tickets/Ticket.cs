@@ -111,4 +111,13 @@ public sealed class Ticket : AggregateRoot
         AssignedAgentId = agentId;
         UpdatedAtUtc = nowUtc;
     }
+
+    /// <summary>
+    /// Sets or updates the SLA due date for the ticket.
+    /// </summary>
+    public void SetDueDate(DateTime dueAtUtc, DateTime nowUtc)
+    {
+        DueAtUtc = dueAtUtc;
+        UpdatedAtUtc = nowUtc;
+    }
 }

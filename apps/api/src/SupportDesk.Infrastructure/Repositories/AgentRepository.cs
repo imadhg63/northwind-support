@@ -7,9 +7,13 @@ namespace SupportDesk.Infrastructure.Repositories;
 
 public sealed class AgentRepository(SupportDbContext db) : IAgentRepository
 {
-    /// <summary>Loads the whole aggregate, specializations included.</summary>
-    public Task<Agent?> GetByIdAsync(int id, CancellationToken ct) =>
-        db.Set<Agent>()
+    public async Task<Agent?> GetByIdAsync(int id, CancellationToken ct) =>
+        await db.Set<Agent>().Include(a => a.Specializations).FirstOrDefaultAsync(a => a.Id == id, ct);
+
+    public async Task<IReadOnlyList<Agent>> GetActiveAsync(CancellationToken ct) =>
+        await db.Set<Agent>()
             .Include(a => a.Specializations)
-            .FirstOrDefaultAsync(a => a.Id == id, ct);
+            .Where(a => a.IsActive)
+            .AsNoTracking()
+            .ToListAsync(ct);
 }

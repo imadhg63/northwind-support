@@ -5,7 +5,9 @@ using SupportDesk.Application.Features.Tickets.Commands.AssignTicket;
 using SupportDesk.Application.Features.Tickets.Commands.ChangeTicketStatus;
 using SupportDesk.Application.Features.Tickets.Commands.RaiseTicket;
 using SupportDesk.Application.Features.Tickets.Queries.GetTicket;
+using SupportDesk.Application.Features.Tickets.Triage;
 using SupportDesk.Domain.Aggregates.Agents;
+using SupportDesk.Domain.Aggregates.Categories;
 using SupportDesk.Domain.Aggregates.Customers;
 using SupportDesk.Domain.Aggregates.Tickets;
 using SupportDesk.Domain.Repositories;
@@ -24,8 +26,20 @@ internal sealed class TicketCommandTestContext
         Customers.Setup(c => c.ExistsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
+        Customers.Setup(c => c.GetByIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Customer("Contoso Ltd", "support@contoso.example", null, CustomerTier.Premium, Clock.UtcNow));
+
         Categories.Setup(c => c.ExistsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+
+        Categories.Setup(c => c.GetByIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Category("General", requiresSpecialist: false, forcesCriticalPriority: false));
+
+        Agents.Setup(a => a.GetActiveAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        Tickets.Setup(t => t.GetOpenCountsPerAgentAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<int, int>());
 
         Tickets.Setup(t => t.NextReferenceAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync("TCK-0041");
@@ -45,9 +59,10 @@ internal sealed class TicketCommandTestContext
             });
 
         var getTicket = new GetTicketQueryHandler(TicketQueries.Object);
+        var triageService = new TicketTriageService();
 
         RaiseTicket = new RaiseTicketCommandHandler(
-            Tickets.Object, Customers.Object, Categories.Object, UnitOfWork.Object, Clock, getTicket,
+            Tickets.Object, Customers.Object, Categories.Object, Agents.Object, triageService, UnitOfWork.Object, Clock, getTicket,
             NullLogger<RaiseTicketCommandHandler>.Instance);
 
         ChangeTicketStatus = new ChangeTicketStatusCommandHandler(Tickets.Object, UnitOfWork.Object, Clock, getTicket);

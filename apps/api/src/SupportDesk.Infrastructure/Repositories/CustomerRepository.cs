@@ -9,4 +9,7 @@ public sealed class CustomerRepository(SupportDbContext db) : ICustomerRepositor
 {
     public Task<bool> ExistsAsync(int id, CancellationToken ct) =>
         db.Set<Customer>().AsNoTracking().AnyAsync(c => c.Id == id, ct);
+
+    public async Task<Customer?> GetByIdAsync(int id, CancellationToken ct) =>
+        await db.Set<Customer>().FindAsync([id], ct);
 }
